@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
 import { AdminServices } from "./admin.service";
 import { pick } from "../../../shared/pick";
-import { adminSearchableFilds } from "./admin.constant";
+import { adminFilterableFileds } from "./admin.constant";
 const getAdmins = async (req: Request, res: Response) => {
   try {
-    const filters = pick(req.query, adminSearchableFilds);
-    const result = await AdminServices.getAllFromDB(filters);
+    const filters = pick(req.query, adminFilterableFileds);
+    const options = pick(req.query, ['page', 'limit', 'sortBy', "sortOrder"])
+    const result = await AdminServices.getAllFromDB(filters, options);
     res.status(200).json({
       success: true,
       message: "Admin created successfully!",
