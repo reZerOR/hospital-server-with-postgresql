@@ -1,9 +1,14 @@
-import { Admin, Prisma, UserRole, UserStatus } from "@prisma/client";
+import { Admin, Prisma, UserStatus } from "@prisma/client";
 import prisma from "../../utls/prismaClient";
 import { adminSearchableFileds } from "./admin.constant";
 import { calculatePagination } from "../../../shared/calculatePagination";
+import { IAdminFilterRequest } from "./admin.interface";
+import { IPaginationOptions } from "../../interfaces/pagination";
 
-const getAllFromDB = async (params: any, options: any) => {
+const getAllFromDB = async (
+  params: IAdminFilterRequest,
+  options: IPaginationOptions
+) => {
   const { searchTerm, ...filterData } = params;
   const { page, limit, sortBy, sortOrder, skip } = calculatePagination(options);
   const andConditions: Prisma.AdminWhereInput[] = [];
@@ -22,7 +27,7 @@ const getAllFromDB = async (params: any, options: any) => {
   if (Object.keys(filterData).length > 0) {
     andConditions.push({
       AND: Object.keys(filterData).map((key) => ({
-        [key]: filterData[key],
+        [key]: (filterData as any)[key],
       })),
     });
   }
@@ -60,6 +65,7 @@ const getAdminById = async (id: string) => {
   });
   return result;
 };
+
 const updateIntoDb = async (id: string, data: Partial<Admin>) => {
   await prisma.admin.findUniqueOrThrow({
     where: {
@@ -75,6 +81,7 @@ const updateIntoDb = async (id: string, data: Partial<Admin>) => {
   });
   return result;
 };
+
 const deleteFromDb = async (id: string) => {
   await prisma.admin.findUniqueOrThrow({
     where: {
@@ -98,6 +105,7 @@ const deleteFromDb = async (id: string) => {
 
   return result;
 };
+
 const softDeleteFromDb = async (id: string) => {
   await prisma.admin.findUniqueOrThrow({
     where: {
